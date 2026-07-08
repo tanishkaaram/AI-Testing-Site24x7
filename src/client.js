@@ -441,9 +441,17 @@
 
   function renderCardsHtml(pageResults, tokens, maxScore) {
     if (!pageResults.length) return '';
+    var stype = document.getElementById('searchType').value;
     return pageResults.map(function(r) {
       var api = r.api; var score = r.score;
-      var pct = maxScore && score ? Math.round((score/maxScore)*100) : 0;
+      var pct;
+      if (stype === 'semantic') {
+        // Absolute percentage, capped at 100%
+        pct = Math.round(Math.min(score, 1.0) * 100);
+      } else {
+        // Relative normalization for unbounded keyword scores
+        pct = maxScore && score ? Math.round((score / maxScore) * 100) : 0;
+      }
       var isExp = expandedCards.has(api.id);
       var resF = (api.responseFields||[]).slice(0,12);
       var reqF = (api.requestFields||[]).slice(0,8);
@@ -466,7 +474,7 @@
             '<button class="copy-endpoint-btn" onclick="event.stopPropagation(); navigator.clipboard.writeText(\''+esc(api.endpoint)+'\'); this.innerHTML=\'&#10004;\'; setTimeout(()=>this.innerHTML=\'&#128203;\', 2000)" title="Copy Endpoint">&#128203;</button>' +
             '<span class="rc-client-tag">Client</span>' +
             '<span class="rc-module-tag">'+esc(api.module.toUpperCase().replace(/ /g,'_'))+'</span>' +
-            (score > 0 ? '<span style="margin-left:auto; font-size:11px; color:#9ca3af; font-family:monospace;">' + (score <= 1.05 ? Math.round(score * 100) + '% Match' : 'Score: ' + Math.round(score)) + '</span>' : '') +
+            (score > 0 ? '<span style="margin-left:auto; font-size:11px; color:#9ca3af; font-family:monospace;">' + pct + '% Match</span>' : '') +
           '</div>' +
           '<div class="rc-desc">'+highlight(api.description, tokens)+'</div>' +
           '<div class="rc-meta">'+esc(api.subFeature)+'</div>' +
