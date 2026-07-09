@@ -40,7 +40,20 @@ For the fastest performance and full Redis vector support, use Docker Compose. T
    ```bash
    docker-compose up -d --build
    ```
-2. **Access the Frontend Application**:
+    Make sure Docker Desktop is running.
+2. Spin up the Redis container in the background:
+   ```bash
+   docker-compose up -d redis
+   ```
+3. Start the proxy server:
+   ```bash
+   npm run proxy
+   ```
+4. Start the frontend UI:
+   ```bash
+   npm run serve
+   ```
+5. **Access the Frontend Application**:
    Open your browser to [http://localhost:3333](http://localhost:3333)
 
 ### Useful Docker Commands
