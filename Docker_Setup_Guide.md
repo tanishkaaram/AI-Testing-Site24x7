@@ -16,14 +16,32 @@ This document tracks the changes made to containerize the AI-Testing-Site24x7 ap
 - **`.dockerignore`**: Added to exclude `node_modules` and hidden directories (like `.git`) from being transferred to the Docker engine during builds, drastically reducing the build time from minutes down to seconds.
 
 ## 3. How to Run the Application
-Because we are using Docker Compose, the application runs entirely in the background. You do not need to run `npm start` manually!
+
+The application is designed to be highly resilient. You can run it either traditionally via Node (with an automatic in-memory vector search fallback) or via Docker Compose (using Redis Stack for maximum performance).
+
+### Option 1: Standard Run (Without Docker)
+If you do not have Docker installed, the proxy will silently and automatically fall back to an **in-memory vector search**. 
+You will need two terminal windows:
+
+1. **Start the Proxy Server:**
+   ```bash
+   npm run proxy
+   ```
+2. **Start the Frontend UI:**
+   ```bash
+   npm run serve
+   ```
+3. Open your browser to [http://localhost:3333](http://localhost:3333)
+
+### Option 2: Advanced Run (With Docker & Redis)
+For the fastest performance and full Redis vector support, use Docker Compose. The application runs entirely in the background.
 
 1. **Start the containers**:
    ```bash
    docker-compose up -d --build
    ```
 2. **Access the Frontend Application**:
-   Open your browser and navigate to: [http://localhost:3333](http://localhost:3333)
+   Open your browser to [http://localhost:3333](http://localhost:3333)
 
 ### Useful Docker Commands
 - **View logs for the proxy server**: `docker-compose logs -f proxy`

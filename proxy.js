@@ -37,8 +37,17 @@ async function initVectorEngine() {
     extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
     console.log('[proxy] Model loaded. Connecting to Redis...');
     
-    redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-    redisClient.on('error', err => console.error('[proxy] Redis Client Error', err.message));
+    redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+      maxRetriesPerRequest: 1,
+      retryStrategy: (times) => {
+        if (times > 1) return null; // stop retrying after 1 attempt
+        return 1000;
+      }
+    });
+    redisClient.on('error', err => {
+      if (err.message.includes('ECONNREFUSED')) return; // suppress spam
+      console.error('[proxy] Redis Client Error', err.message);
+    });
     
     // Check if the HASH-based index exists (correct binary format)
     try {
